@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+pymongo
+pandas
+numpy
+scikit-learn
+joblib
+pytest
+httpx
+mongomock

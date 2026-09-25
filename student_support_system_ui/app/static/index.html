@@ -1,0 +1,128 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Student Support Desk</title><script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--bg:#f5f7fa;--c:#fff;--t:#172033;--m:#667085;--p:#2455d6;--pd:#1a43b0;--pl:#eaf0ff;--b:#e4e8ef;--side:#131c2e;--r:10px;--sh:0 1px 2px rgba(16,24,40,.05)}
+*{box-sizing:border-box}body{margin:0;font:14px/1.5 Inter,system-ui,-apple-system,Segoe UI,sans-serif;background:var(--bg);color:var(--t)}
+h1,h2,h3,h4{margin:0;line-height:1.25}h2{font-size:20px}h3{font-size:15px}a{color:var(--p)}
+button,input,select,textarea{font:inherit;color:inherit}
+input,select,textarea{padding:8px 11px;border:1px solid #cfd6e2;border-radius:8px;background:#fff;max-width:100%}
+input:focus,select:focus,textarea:focus,button:focus-visible{outline:2px solid var(--p);outline-offset:1px;border-color:var(--p)}
+textarea{width:100%;resize:vertical}label{display:block;font-weight:600;font-size:13px;margin:0 0 4px}
+button{padding:8px 14px;border:0;border-radius:8px;background:var(--p);color:#fff;font-weight:600;cursor:pointer;transition:background .15s}
+button:hover{background:var(--pd)}button.s{background:#fff;color:var(--t);border:1px solid #cfd6e2}button.s:hover{background:#f2f4f8}
+button:disabled{opacity:.55;cursor:not-allowed}
+/* landing/login */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 16px;background:linear-gradient(#fff,#eef2f9)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px}.logo{width:34px;height:34px;border-radius:8px;background:var(--p);color:#fff;display:grid;place-items:center;font-size:17px}
+.hero h1{font-size:30px;margin:22px 0 6px;text-align:center}.hero p.sub{color:var(--m);margin:0 0 30px;text-align:center}
+.roles{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;width:100%;max-width:720px}
+.role{background:var(--c);border:1px solid var(--b);border-radius:12px;padding:24px;cursor:pointer;box-shadow:var(--sh);transition:.15s}
+.role:hover,.role:focus{border-color:var(--p);box-shadow:0 4px 14px rgba(36,85,214,.12)}.role .ic{width:40px;height:40px;border-radius:10px;background:var(--pl);display:grid;place-items:center;font-size:20px;margin-bottom:14px}
+.role h3{margin-bottom:4px}.role span{color:var(--m);font-size:13px}
+.login{width:100%;max-width:400px;background:#fff;border:1px solid var(--b);border-radius:12px;padding:28px;box-shadow:0 4px 20px rgba(16,24,40,.07)}
+.login input{width:100%;margin-bottom:14px}.login .row{display:flex;gap:8px}.login .row button:first-child{flex:1}
+.err{color:#b42318;font-size:13px;min-height:18px}
+/* shell */
+.app{display:flex;min-height:100vh}.side{width:232px;background:var(--side);color:#fff;padding:18px 14px;flex-shrink:0;display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
+.side .brand{padding:0 6px 18px;font-size:16px}.user{padding:10px;border-radius:8px;background:rgba(255,255,255,.06);margin-bottom:14px;font-size:13px}.user small{color:#9fb0cf;text-transform:capitalize}
+.nav a{display:flex;gap:10px;align-items:center;color:#c5d0e6;padding:9px 10px;border-radius:8px;cursor:pointer;margin-bottom:2px;text-decoration:none}
+.nav a:hover,.nav a.on{background:rgba(255,255,255,.1);color:#fff}.nav .sp{flex:1}
+.main{flex:1;padding:28px;min-width:0;max-width:1400px}.top{display:none}
+.head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:20px}.head p{margin:2px 0 0;color:var(--m)}
+.card{background:var(--c);border:1px solid var(--b);border-radius:var(--r);padding:18px;margin-bottom:16px;box-shadow:var(--sh)}
+.card>h3{margin-bottom:12px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:16px}
+.kpi{background:#fff;border:1px solid var(--b);border-radius:var(--r);padding:16px;cursor:pointer;box-shadow:var(--sh);border-left:4px solid var(--k,#94a3b8);transition:.15s}
+.kpi:hover{box-shadow:0 4px 12px rgba(16,24,40,.08)}.kpi small{color:var(--m);font-weight:600}.kpi b{font-size:28px;display:block;line-height:1.2}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}.two .card{margin:0}.chart{height:230px;position:relative}
+.att{border-left:4px solid #d92d20;background:#fffafa}.att .items{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.att a{display:block;padding:10px 12px;border:1px solid #f5d0cd;border-radius:8px;background:#fff;text-decoration:none;color:var(--t)}.att a b{font-size:20px;display:block;color:#b42318}.att a:hover{background:#fff1f0}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}.tools input{min-width:200px}
+.tw{overflow-x:auto;padding:0!important}table{width:100%;border-collapse:collapse;min-width:760px}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.03em;color:var(--m);background:#f9fafc;position:sticky;top:0}
+td,th{text-align:left;padding:11px 14px;border-bottom:1px solid var(--b)}tr.r{cursor:pointer}tr.r:hover{background:#f4f7fe}tr:last-child td{border-bottom:0}
+.badge{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:600;background:#eef1f6;color:#475467;white-space:nowrap}
+.Urgent,.Breached,.Escalated{background:#fde8e7;color:#b42318}.High,.At.Risk{background:#fff1d9;color:#9a5b00}.Medium,.Open,.Assigned{background:#e6eefe;color:#1e4bb8}
+.In.Progress{background:#ece9fe;color:#5b3fc4}.Pending.Student{background:#fdf0d5;color:#8a5a00}.Resolved,.Closed,.Within.SLA{background:#def5e6;color:#146c2e}.Low{background:#eef1f6;color:#475467}
+.empty{text-align:center;color:var(--m);padding:36px 16px}.empty b{display:block;color:var(--t);font-size:15px;margin-bottom:4px}
+.load{padding:40px;text-align:center;color:var(--m)}.load:before{content:"";display:inline-block;width:18px;height:18px;border:2px solid #cfd6e2;border-top-color:var(--p);border-radius:50%;animation:sp .7s linear infinite;vertical-align:-4px;margin-right:8px}@keyframes sp{to{transform:rotate(360deg)}}
+.errbox{background:#fef3f2;border:1px solid #fecdca;color:#b42318;padding:14px;border-radius:var(--r)}
+.form{max-width:680px}.fg{margin-bottom:14px}.fr{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}.fr input,.fr select,.form input:not([type=number]){width:100%}.fg input{width:100%}
+/* detail */
+.dl{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px;align-items:start}.dl .card{margin-bottom:16px}
+.info{display:grid;grid-template-columns:110px 1fr;gap:9px 10px;font-size:13px}.info dt{color:var(--m)}.info dd{margin:0;font-weight:500;word-break:break-word}
+.desc{white-space:pre-wrap;background:#f9fafc;border:1px solid var(--b);border-radius:8px;padding:12px}
+.tl{list-style:none;margin:0;padding:0 0 0 14px;border-left:2px solid var(--b)}.tl li{position:relative;padding:0 0 14px 14px}.tl li:before{content:"";position:absolute;left:-21px;top:5px;width:10px;height:10px;border-radius:50%;background:var(--p);border:2px solid #fff}
+.tl small{color:var(--m)}.note{background:#fffbe6;border:1px solid #f3e3a0;border-radius:8px;padding:10px 12px;margin-bottom:10px}
+.warn{background:#fff1d9;padding:9px 12px;border-radius:8px;color:#7a4b00}.acts{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
+.sla{border-left:4px solid var(--k,#2e9e5b)}
+.toast{position:fixed;bottom:20px;right:20px;background:#172033;color:#fff;padding:11px 16px;border-radius:8px;z-index:9;box-shadow:0 6px 20px rgba(0,0,0,.2)}
+@media(max-width:900px){.dl{grid-template-columns:1fr}}
+@media(max-width:760px){.app{flex-direction:column}.side{width:100%;height:auto;position:static;padding:10px 12px;flex-direction:row;flex-wrap:wrap;align-items:center;gap:6px}.side .brand{padding:0;flex:1}.user{display:none}
+.nav{display:flex;flex-wrap:wrap;gap:4px;width:100%}.nav a{padding:6px 10px;margin:0}.nav .sp{display:none}.main{padding:16px}}
+</style></head><body><div id="root"></div><script>
+let tok=sessionStorage.tok,me=null,ROLE=null,filt={},charts=[];
+const $=s=>document.querySelector(s),R=$('#root');
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const bd=v=>`<span class="badge ${esc(v)}">${esc(v)}</span>`;
+const LOAD='<div class="load">Loading…</div>',EMPTY=(t,s)=>`<div class="empty"><b>${t}</b>${s||''}</div>`,ERR=e=>`<div class="errbox">${esc(e.message)}</div>`;
+function toast(m){const d=document.createElement('div');d.className='toast';d.textContent=m;document.body.appendChild(d);setTimeout(()=>d.remove(),3000)}
+async function api(p,o={}){const r=await fetch('/api'+p,{method:o.body?'POST':'GET',headers:{'Content-Type':'application/json',Authorization:'Bearer '+tok},body:o.body&&JSON.stringify(o.body)});
+ const d=await r.json().catch(()=>({}));if(!r.ok){if(r.status==401&&tok){logout();}throw new Error(typeof d.detail=='string'?d.detail:JSON.stringify(d.detail||'Error'))}return d}
+function logout(){sessionStorage.clear();tok=null;me=null;landing()}
+function landing(){R.innerHTML=`<div class="hero"><div class="brand"><div class="logo">S</div>Student Support Desk</div><h1>Welcome to the Support Portal</h1><p class="sub">Raise, track and resolve college support requests in one place.</p><div class="roles">
+ ${[['student','🎓','Student','Raise and track your tickets','Roll number'],['staff','🛠️','Staff','Handle assigned support tickets','Employee ID'],['manager','📊','Manager / Admin','Monitor SLA, workload and escalations','Username']].map(r=>`<div class="role" tabindex="0" onkeydown="if(event.key=='Enter')this.click()" onclick="loginForm('${r[0]}','${r[4]}')"><div class="ic">${r[1]}</div><h3>${r[2]}</h3><span>${r[3]}</span></div>`).join('')}</div></div>`}
+function loginForm(role,lbl){const nm={student:'Student',staff:'Staff',manager:'Manager / Admin'}[role];R.innerHTML=`<div class="hero"><div class="brand"><div class="logo">S</div>Student Support Desk</div><h1 style="font-size:22px">${nm} sign in</h1><p class="sub">Enter your credentials to continue</p><div class="login">
+ <label for="u">${lbl}</label><input id="u" autocomplete="username" onkeydown="if(event.key=='Enter')$('#p').focus()"><label for="p">Password</label><input id="p" type="password" autocomplete="current-password" onkeydown="if(event.key=='Enter')doLogin('${role}')">
+ <p id="e" class="err"></p><div class="row"><button id="lb" onclick="doLogin('${role}')">Sign in</button><button class="s" onclick="landing()">Back</button></div></div></div>`;$('#u').focus()}
+async function doLogin(role){const b=$('#lb');b.disabled=true;b.textContent='Signing in…';try{const d=await api('/login',{body:{role,username:$('#u').value.trim(),password:$('#p').value}});tok=sessionStorage.tok=d.token;me=d.user;shell()}catch(e){$('#e').textContent=e.message;b.disabled=false;b.textContent='Sign in'}}
+function nav(el){document.querySelectorAll('.nav a').forEach(a=>a.classList.remove('on'));if(el)el.classList.add('on')}
+async function shell(){if(!me)me=await api('/me');const st=me.role=='student';
+ R.innerHTML=`<div class="app"><div class="side"><div class="brand"><div class="logo">S</div>Support Desk</div><div class="user"><b>${esc(me.name)}</b><br><small>${me.role}${me.team?' · '+esc(me.team):''}</small></div>
+ <div class="nav"><a class="on" onclick="nav(this);dash()">▦ Dashboard</a><a onclick="nav(this);list({})">☰ Tickets</a>${st?'<a onclick="nav(this);newForm()">＋ New ticket</a>':''}
+ ${me.role!='student'&&me.role!='staff'?'<a onclick="autoEsc()">⚡ Run auto-escalation</a>':''}<div class="sp"></div><a onclick="logout()">⎋ Sign out</a></div></div><div class="main" id="main"></div></div>`;dash()}
+function killCharts(){charts.forEach(c=>c.destroy());charts=[]}
+const rows=ts=>ts.length?`<table><tr><th>ID<th>Title<th>Category<th>Priority<th>Status<th>Team<th>Staff<th>SLA<th>Age</tr>${ts.map(t=>`<tr class="r" onclick="detail('${t.ticket_id}')"><td><b>${t.ticket_id}</b><td>${esc(t.title)}<td>${esc(t.category)}<td>${bd(t.priority)}<td>${bd(t.status)}<td>${esc(t.assigned_team)}<td>${esc(t.assigned_staff_id||'—')}<td>${bd(t.sla.state)}<td>${t.sla.age_hours}h</tr>`).join('')}</table>`:EMPTY('No tickets found','Try changing your filters.');
+async function dash(){killCharts();const m=$('#main');m.innerHTML=LOAD;try{const [d,ts]=await Promise.all([api('/dashboard'),api('/tickets')]);const a=d.attention,st=me.role=='student',mg=!st&&me.role!='staff';
+ const k=(l,v,f,c)=>`<div class="kpi" style="--k:${c}" onclick='list(${JSON.stringify(f)})'><small>${l}</small><b>${v}</b></div>`,bs=d.by_status;
+ const recent=`<div class="card tw"><div style="padding:16px 18px 0"><h3>${st?'Recent tickets':'Recent activity'}</h3></div>${rows(ts.slice(0,8))}</div>`;
+ const attn=`<div class="card att"><h3>⚠ Attention required</h3><div class="items"><a href="#" onclick='list({sla:"Breached"});return false'><b>${a.sla_breached}</b>SLA breaches</a><a href="#" onclick='list({unassigned:true,priority:"Urgent"});return false'><b>${a.high_unassigned}</b>High/urgent unassigned</a><a href="#" onclick='list({sla:"At Risk"});return false'><b>${a.at_risk}</b>Approaching SLA deadline</a><a href="#" onclick='list({ageing:"72h+"});return false'><b>${d.ageing["72h+"]}</b>Older than 72h</a></div></div>`;
+ m.innerHTML=`<div class="head"><div><h2>${st?'Welcome, '+esc(me.name):mg?'Operations overview':'Support workspace'}</h2><p>${st?'Here is the status of your support requests.':'Live view of ticket volume and SLA health.'}</p></div>${st?'<button onclick="newForm()">＋ Create ticket</button>':''}</div>
+ <div class="grid">${k(st?'All tickets':'Total',d.total,{},'#64748b')}${k('Open',bs.Open||0,{status:'Open'},'#2455d6')}${k('In Progress',bs['In Progress']||0,{status:'In Progress'},'#7c5cdb')}${k('Pending Student',bs['Pending Student']||0,{status:'Pending Student'},'#d99000')}${k('Resolved',bs.Resolved||0,{status:'Resolved'},'#2e9e5b')}${k('Escalated',bs.Escalated||0,{status:'Escalated'},'#d92d20')}</div>
+ ${st?'':attn}${st?'':`<div class="two" style="margin-bottom:16px"><div class="card"><h3>Tickets by category</h3><div class="chart"><canvas id="c1"></canvas></div></div><div class="card"><h3>Tickets by priority</h3><div class="chart"><canvas id="c2"></canvas></div></div><div class="card"><h3>SLA overview</h3><div class="chart"><canvas id="c3"></canvas></div></div><div class="card"><h3>Staff workload (active)</h3><div class="chart"><canvas id="c4"></canvas></div></div></div>`}${recent}`;
+ if(!st){ch('c1','Tickets by category',d.by_category,'doughnut');ch('c2','Tickets by priority',d.by_priority,'doughnut');ch('c3','SLA performance',d.sla,'bar');ch('c4','Staff workload (active)',d.workload,'bar')}}catch(e){m.innerHTML=ERR(e)}}
+const PAL=['#2455d6','#7c5cdb','#2e9e5b','#d99000','#d92d20','#0e9aa7','#64748b'];
+function ch(id,t,o,type){if(typeof Chart=='undefined')return;const dn=type=='doughnut';charts.push(new Chart($('#'+id),{type,data:{labels:Object.keys(o),datasets:[{label:t,data:Object.values(o),backgroundColor:dn?PAL:'#2455d6',borderRadius:dn?0:4}]},options:{maintainAspectRatio:false,plugins:{legend:{display:dn,position:'right'}},scales:dn?{}:{y:{beginAtZero:true,ticks:{precision:0}}}}}))}
+async function list(f){killCharts();filt=f;const m=$('#main');const qs=new URLSearchParams(filt).toString();m.innerHTML=LOAD;
+ try{const ts=await api('/tickets?'+qs);const sel=(k,v)=>`<select onchange="filt.${k}=this.value;if(!this.value)delete filt.${k};list(filt)"><option value="">All ${k}</option>${v.map(x=>`<option ${filt[k]==x?'selected':''}>${x}</option>`).join('')}</select>`;
+ m.innerHTML=`<div class="head"><div><h2>Tickets</h2><p>${ts.length} ticket${ts.length==1?'':'s'}</p></div>${me.role=='student'?'<button onclick="newForm()">＋ Create ticket</button>':''}</div><div class="card"><div class="tools" style="margin:0">${me.role!='student'?`<input placeholder="Search ticket / student ID" value="${esc(filt.q||'')}" onchange="filt.q=this.value;list(filt)">`:''}
+ ${sel('status',['Open','Assigned','In Progress','Pending Student','Resolved','Closed','Escalated'])}${sel('priority',['Low','Medium','High','Urgent'])}${sel('category',['Fee','Attendance','ID Card','Documents','Certificate','Discipline','Other'])}${sel('sla',['Within SLA','At Risk','Breached'])}<button class="s" onclick="list({})">Clear</button></div></div>
+ <div class="card tw">${rows(ts)}</div>`}catch(e){m.innerHTML=ERR(e)}}
+function newForm(){killCharts();$('#main').innerHTML=`<div class="head"><div><h2>New ticket</h2><p>Describe your issue and we'll route it to the right team.</p></div></div><div class="card form"><div class="fg"><label for="t">Title</label><input id="t" placeholder="Short summary"></div><div class="fg"><label for="d">Description</label><textarea id="d" rows="5" placeholder="Describe your issue"></textarea></div>
+ <div class="fr fg"><div><label for="dep">Department</label><input id="dep" value="CSE"></div><div><label for="y">Year</label><input id="y" type="number" value="1" min="1" max="6"></div><div><label for="s">Semester</label><input id="s" type="number" value="1" min="1" max="12"></div><div><label for="co">Course</label><input id="co" value="B.Tech CSE"></div></div>
+ <div class="fg"><label for="ch">Channel</label><select id="ch"><option>Web Portal</option><option>Email</option><option>Help Desk</option></select></div><p id="e" class="err"></p><button id="sb" onclick="create()">Submit ticket</button> <button class="s" onclick="dash()">Cancel</button></div>`}
+async function create(){const b=$('#sb');b.disabled=true;b.textContent='Submitting…';try{const t=await api('/tickets',{body:{title:$('#t').value,description:$('#d').value,department:$('#dep').value,year:+$('#y').value,semester:+$('#s').value,course:$('#co').value,channel:$('#ch').value}});
+ $('#main').innerHTML=`<div class="card form"><h2>✓ Ticket submitted</h2><p>Your ticket ID: <b>${t.ticket_id}</b></p><button onclick="detail('${t.ticket_id}')">View ticket</button> <button class="s" onclick="dash()">Dashboard</button></div>`}catch(e){$('#e').textContent=e.message;b.disabled=false;b.textContent='Submit ticket'}}
+async function act(id,p,body){if(p=='/escalate'&&!confirm('Escalate this ticket?'))return;try{await api(`/tickets/${id}${p}`,{body:body||{}});toast('Updated');detail(id)}catch(e){toast(e.message)}}
+async function detail(id){killCharts();const m=$('#main');m.innerHTML=LOAD;try{const t=await api('/tickets/'+id);const st=me.role!='student',mg=me.role=='manager'||me.role=='admin',ai=t.ai;
+ const staff=mg?(await api('/staff')).filter(s=>s.team==t.assigned_team):[];const sc={Breached:'#d92d20','At Risk':'#d99000'}[t.sla.state]||'#2e9e5b';
+ const ev=t.timeline.filter(e=>!e.internal),nt=t.timeline.filter(e=>e.internal);
+ const tlh=l=>l.length?`<ul class="tl">${l.map(e=>`<li><small>${e.ts} · ${esc(e.actor)}</small><br><b>${esc(e.action)}</b> ${esc(e.detail)}</li>`).join('')}</ul>`:EMPTY('No activity yet');
+ m.innerHTML=`<div class="head"><div><button class="s" onclick="list(filt)">← Back to tickets</button><h2 style="margin-top:12px">${t.ticket_id} — ${esc(t.title)}</h2><div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">${bd(t.status)} ${bd(t.priority)} ${bd(t.sla.state)} <span class="badge">${esc(t.category)}</span></div></div></div>
+ <div class="dl"><div>
+ <div class="card"><h3>Description</h3><div class="desc">${esc(t.description)}</div></div>
+ ${st&&ai?`<div class="card"><h3>AI recommendation</h3>${ai.needs_review?'<p class="warn">Low confidence prediction (or no model) — manual verification required.</p>':''}
+ <p>Category: <b>${esc(ai.category||'n/a')}</b> (${ai.category_conf!=null?Math.round(ai.category_conf*100)+'%':'—'}) · Priority: <b>${esc(ai.priority||'n/a')}</b> (${ai.priority_conf!=null?Math.round(ai.priority_conf*100)+'%':'—'}) · source: ${esc(ai.source)}</p>
+ <div class="acts"><button onclick="act('${id}','/override',{})">Accept</button><select id="oc">${['Fee','Attendance','ID Card','Documents','Certificate','Discipline','Other'].map(x=>`<option ${x==t.category?'selected':''}>${x}</option>`).join('')}</select>
+ <select id="op">${['Low','Medium','High','Urgent'].map(x=>`<option ${x==t.priority?'selected':''}>${x}</option>`).join('')}</select><button class="s" onclick="act('${id}','/override',{category:$('#oc').value,priority:$('#op').value})">Change</button></div></div>`:''}
+ <div class="card"><h3>Conversation & activity</h3>${tlh(ev)}${t.status!='Closed'?`<textarea id="rt" rows="3" placeholder="Write a reply"></textarea><div class="acts"><button onclick="if(!$('#rt').value.trim())return toast('Write something first');act('${id}','/reply',{text:$('#rt').value})">Reply</button>${st?`<button class="s" onclick="if(!$('#rt').value.trim())return toast('Write something first');act('${id}','/reply',{text:$('#rt').value,internal:true})">Add internal note</button>`:''}</div>`:''}
+ ${!st&&(t.status=='Resolved'||t.status=='Closed')&&!t.satisfaction_score?`<p>Rate this resolution: ${[1,2,3,4,5].map(n=>`<button class="s" onclick="act('${id}','/feedback',{score:${n}})">${n}</button>`).join(' ')}</p>`:''}</div>
+ ${st?`<div class="card"><h3>Internal notes</h3>${nt.length?nt.map(e=>`<div class="note"><small>${e.ts} · ${esc(e.actor)}</small><br>${esc(e.action)} ${esc(e.detail)}</div>`).join(''):EMPTY('No internal notes')}</div>`:''}
+ </div><div>
+ <div class="card sla" style="--k:${sc}"><h3>SLA</h3><dl class="info"><dt>State</dt><dd>${bd(t.sla.state)}</dd><dt>Deadline</dt><dd>${esc(t.sla.deadline)}</dd><dt>Remaining</dt><dd>${t.sla.remaining_hours}h</dd><dt>Age</dt><dd>${t.sla.age_hours}h</dd></dl></div>
+ <div class="card"><h3>Ticket details</h3><dl class="info"><dt>Student</dt><dd>${esc(t.student_id)}</dd><dt>Department</dt><dd>${esc(t.department)}</dd><dt>Category</dt><dd>${esc(t.category)}</dd><dt>Priority</dt><dd>${bd(t.priority)}</dd><dt>Status</dt><dd>${bd(t.status)}</dd><dt>Team</dt><dd>${esc(t.assigned_team)}</dd><dt>Staff</dt><dd>${esc(t.assigned_staff_id||'Unassigned')}</dd><dt>Created</dt><dd>${esc(t.created_at)}</dd></dl></div>
+ ${st?`<div class="card"><h3>Actions</h3><div class="acts" style="margin-top:0"><select id="ns">${['In Progress','Pending Student','Resolved','Closed'].map(x=>`<option>${x}</option>`).join('')}</select><button onclick="act('${id}','/status',{status:$('#ns').value})">Set status</button><button class="s" onclick="act('${id}','/escalate')">Escalate</button></div>
+ ${mg?`<div class="acts"><select id="as">${staff.map(s=>`<option>${s.username}</option>`).join('')}</select><button class="s" onclick="act('${id}','/assign',{staff_id:$('#as').value})">Assign</button></div>`:''}</div>`:''}
+ </div></div>`}catch(e){m.innerHTML=ERR(e)}}
+async function autoEsc(){if(!confirm('Run auto-escalation now?'))return;try{const r=await api('/admin/auto-escalate',{body:{}});toast(r.escalated+' ticket(s) escalated');dash()}catch(e){toast(e.message)}}
+tok?shell().catch(logout):landing();
+</script></body></html>

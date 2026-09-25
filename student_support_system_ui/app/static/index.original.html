@@ -1,0 +1,72 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Student Support Desk</title><script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--bg:#f4f6fa;--c:#fff;--t:#1c2333;--m:#6b7590;--p:#4f46e5;--b:#e3e7ef}
+*{box-sizing:border-box}body{margin:0;font:14px system-ui,sans-serif;background:var(--bg);color:var(--t)}
+.center{max-width:760px;margin:8vh auto;text-align:center;padding:0 16px}.cards{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
+.role{background:var(--c);border:1px solid var(--b);border-radius:12px;padding:28px;width:200px;cursor:pointer}.role:hover{border-color:var(--p)}
+.app{display:flex;min-height:100vh}.side{width:210px;background:#1c2333;color:#fff;padding:18px;flex-shrink:0}.side a{display:block;color:#c6cce0;padding:8px 0;cursor:pointer}
+.main{flex:1;padding:24px;min-width:0}.card{background:var(--c);border:1px solid var(--b);border-radius:10px;padding:16px;margin-bottom:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}.stat{cursor:pointer}.stat b{font-size:24px;display:block}
+table{width:100%;border-collapse:collapse}td,th{text-align:left;padding:8px;border-bottom:1px solid var(--b)}tr.r{cursor:pointer}tr.r:hover{background:#f0f2ff}
+input,select,textarea,button{font:inherit;padding:8px;border:1px solid var(--b);border-radius:6px;margin:2px}textarea{width:100%}
+button{background:var(--p);color:#fff;border:0;cursor:pointer}button.s{background:#e8eaf3;color:var(--t)}
+.badge{padding:2px 8px;border-radius:10px;font-size:12px;background:#e8eaf3}.Urgent,.Breached,.Escalated{background:#fde2e2;color:#b42318}.High,.At.Risk{background:#fff0d6;color:#9a5b00}.Resolved,.Closed,.Within.SLA{background:#dcf5e4;color:#146c2e}
+.err{color:#b42318}.note{background:#fffbe6}.warn{background:#fff0d6;padding:8px;border-radius:6px}.flex{display:flex;gap:16px;flex-wrap:wrap}.flex>*{flex:1;min-width:280px}
+</style></head><body><div id="root"></div><script>
+let tok=sessionStorage.tok,me=null,ROLE=null,filt={};
+const $=s=>document.querySelector(s),R=$('#root');
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const bd=v=>`<span class="badge ${esc(v)}">${esc(v)}</span>`;
+async function api(p,o={}){const r=await fetch('/api'+p,{method:o.body?'POST':'GET',headers:{'Content-Type':'application/json',Authorization:'Bearer '+tok},body:o.body&&JSON.stringify(o.body)});
+ const d=await r.json().catch(()=>({}));if(!r.ok){if(r.status==401&&tok){logout();}throw new Error(typeof d.detail=='string'?d.detail:JSON.stringify(d.detail||'Error'))}return d}
+function logout(){sessionStorage.clear();tok=null;landing()}
+function landing(){R.innerHTML=`<div class="center"><h1>Student Support Desk</h1><p>Sign in to continue</p><div class="cards">
+ ${[['student','Student','Roll number'],['staff','Staff','Employee ID'],['manager','Manager / Admin','Username']].map(r=>`<div class="role" onclick="loginForm('${r[0]}','${r[2]}')"><h2>${r[1]}</h2></div>`).join('')}</div></div>`}
+function loginForm(role,lbl){R.innerHTML=`<div class="center"><div class="card"><h2>${role} login</h2><input id=u placeholder="${lbl}"><br><input id=p type=password placeholder=Password><br>
+ <button onclick="doLogin('${role}')">Sign in</button> <button class=s onclick="landing()">Back</button><p id=e class=err></p></div></div>`}
+async function doLogin(role){try{const d=await api('/login',{body:{role,username:$('#u').value.trim(),password:$('#p').value}});tok=sessionStorage.tok=d.token;me=d.user;shell()}catch(e){$('#e').textContent=e.message}}
+async function shell(){if(!me)me=await api('/me');const st=me.role=='student';
+ R.innerHTML=`<div class="app"><div class="side"><h3>Support Desk</h3><small>${esc(me.name)}<br>${me.role}${me.team?' · '+esc(me.team):''}</small><hr>
+ <a onclick="dash()">Dashboard</a><a onclick="list({})">Tickets</a>${st?'<a onclick="newForm()">New ticket</a>':''}
+ ${me.role!='student'&&me.role!='staff'?'<a onclick="autoEsc()">Run auto-escalation</a>':''}<a onclick="logout()">Sign out</a></div><div class="main" id="main"></div></div>`;dash()}
+async function dash(){const m=$('#main');m.innerHTML='Loading…';try{const d=await api('/dashboard');const a=d.attention;
+ const stat=(l,v,f)=>`<div class="card stat" onclick='list(${JSON.stringify(f)})'>${l}<b>${v}</b></div>`;
+ m.innerHTML=`<h2>Dashboard</h2><div class="grid">${stat('Total',d.total,{})}${stat('Open',d.by_status.Open||0,{status:'Open'})}${stat('In Progress',d.by_status['In Progress']||0,{status:'In Progress'})}
+ ${stat('Pending Student',d.by_status['Pending Student']||0,{status:'Pending Student'})}${stat('Resolved',d.by_status.Resolved||0,{status:'Resolved'})}${stat('Escalated',d.by_status.Escalated||0,{status:'Escalated'})}</div>
+ ${me.role=='student'?'':`<div class="card"><h3>Attention required</h3><p><a href="#" onclick='list({sla:"Breached"});return false'>${a.sla_breached} SLA breaches</a> ·
+ <a href="#" onclick='list({unassigned:true,priority:"Urgent"});return false'>${a.high_unassigned} high/urgent unassigned</a> ·
+ <a href="#" onclick='list({sla:"At Risk"});return false'>${a.at_risk} approaching SLA deadline</a> · <a href="#" onclick='list({ageing:"72h+"});return false'>${d.ageing["72h+"]} tickets older than 72h</a></p></div>
+ <div class="flex"><div class="card"><canvas id=c1></canvas></div><div class="card"><canvas id=c2></canvas></div><div class="card"><canvas id=c3></canvas></div><div class="card"><canvas id=c4></canvas></div></div>`}`;
+ if(me.role!='student'){ch('c1','Tickets by category',d.by_category);ch('c2','Tickets by priority',d.by_priority);ch('c3','SLA performance',d.sla);ch('c4','Staff workload (active)',d.workload)}}catch(e){m.innerHTML=`<p class=err>${esc(e.message)}</p>`}}
+function ch(id,t,o){new Chart($('#'+id),{type:'bar',data:{labels:Object.keys(o),datasets:[{label:t,data:Object.values(o),backgroundColor:'#6366f1'}]},options:{plugins:{legend:{display:true}}}})}
+async function list(f){filt=f;const m=$('#main');const qs=new URLSearchParams(filt).toString();m.innerHTML='Loading…';
+ try{const ts=await api('/tickets?'+qs);const sel=(k,v)=>`<select onchange="filt.${k}=this.value;if(!this.value)delete filt.${k};list(filt)"><option value="">${k}</option>${v.map(x=>`<option ${filt[k]==x?'selected':''}>${x}</option>`).join('')}</select>`;
+ m.innerHTML=`<h2>Tickets</h2><div class="card">${me.role!='student'?`<input placeholder="Ticket/Student ID" value="${esc(filt.q||'')}" onchange="filt.q=this.value;list(filt)">`:''}
+ ${sel('status',['Open','Assigned','In Progress','Pending Student','Resolved','Closed','Escalated'])}${sel('priority',['Low','Medium','High','Urgent'])}${sel('category',['Fee','Attendance','ID Card','Documents','Certificate','Discipline','Other'])}${sel('sla',['Within SLA','At Risk','Breached'])}<button class=s onclick="list({})">Clear</button></div>
+ <div class="card" style="overflow:auto">${ts.length?`<table><tr><th>ID<th>Title<th>Category<th>Priority<th>Status<th>Team<th>Staff<th>SLA<th>Age</tr>${ts.map(t=>`<tr class=r onclick="detail('${t.ticket_id}')"><td>${t.ticket_id}<td>${esc(t.title)}<td>${t.category}<td>${bd(t.priority)}<td>${bd(t.status)}<td>${esc(t.assigned_team)}<td>${esc(t.assigned_staff_id||'—')}<td>${bd(t.sla.state)}<td>${t.sla.age_hours}h</tr>`).join('')}</table>`:'<p>No tickets match.</p>'}</div>`}catch(e){m.innerHTML=`<p class=err>${esc(e.message)}</p>`}}
+function newForm(){$('#main').innerHTML=`<h2>New ticket</h2><div class="card"><input id=t placeholder=Title style="width:100%"><textarea id=d rows=5 placeholder="Describe your issue"></textarea>
+ <input id=dep placeholder=Department value=CSE><input id=y type=number value=1 min=1 max=6><input id=s type=number value=1 min=1 max=12><input id=co placeholder=Course value="B.Tech CSE">
+ <select id=ch><option>Web Portal</option><option>Email</option><option>Help Desk</option></select><br><button onclick="create()">Submit</button><p id=e class=err></p></div>`}
+async function create(){try{const t=await api('/tickets',{body:{title:$('#t').value,description:$('#d').value,department:$('#dep').value,year:+$('#y').value,semester:+$('#s').value,course:$('#co').value,channel:$('#ch').value}});
+ $('#main').innerHTML=`<div class="card"><h2>Ticket submitted</h2><p>Your ticket ID: <b>${t.ticket_id}</b></p><button onclick="detail('${t.ticket_id}')">View ticket</button></div>`}catch(e){$('#e').textContent=e.message}}
+async function act(id,p,body){if(p=='/escalate'&&!confirm('Escalate this ticket?'))return;try{await api(`/tickets/${id}${p}`,{body:body||{}});detail(id)}catch(e){alert(e.message)}}
+async function detail(id){const m=$('#main');try{const t=await api('/tickets/'+id);const st=me.role!='student',mg=me.role=='manager'||me.role=='admin',ai=t.ai;
+ const staff=mg?(await api('/staff')).filter(s=>s.team==t.assigned_team):[];
+ m.innerHTML=`<button class=s onclick="list(filt)">← Back</button><h2>${t.ticket_id} — ${esc(t.title)}</h2>
+ <div class="card">${bd(t.status)} ${bd(t.priority)} ${bd(t.sla.state)}<p>Student: ${esc(t.student_id)} · ${esc(t.department)} · ${esc(t.category)} · Team: ${esc(t.assigned_team)} · Staff: ${esc(t.assigned_staff_id||'unassigned')}<br>
+ Created ${t.created_at} · SLA deadline ${t.sla.deadline} · remaining ${t.sla.remaining_hours}h · age ${t.sla.age_hours}h</p><p>${esc(t.description)}</p></div>
+ ${st&&ai?`<div class="card"><h3>AI recommendation</h3>${ai.needs_review?'<p class=warn>Low confidence prediction (or no model) — manual verification required.</p>':''}
+ <p>Category: <b>${esc(ai.category||'n/a')}</b> (${ai.category_conf!=null?Math.round(ai.category_conf*100)+'%':'—'}) · Priority: <b>${esc(ai.priority||'n/a')}</b> (${ai.priority_conf!=null?Math.round(ai.priority_conf*100)+'%':'—'}) · source: ${ai.source}</p>
+ <button onclick="act('${id}','/override',{})">Accept</button>
+ <select id=oc>${['Fee','Attendance','ID Card','Documents','Certificate','Discipline','Other'].map(x=>`<option ${x==t.category?'selected':''}>${x}</option>`).join('')}</select>
+ <select id=op>${['Low','Medium','High','Urgent'].map(x=>`<option ${x==t.priority?'selected':''}>${x}</option>`).join('')}</select>
+ <button class=s onclick="act('${id}','/override',{category:$('#oc').value,priority:$('#op').value})">Change</button></div>`:''}
+ ${st?`<div class="card"><select id=ns>${['In Progress','Pending Student','Resolved','Closed'].map(x=>`<option>${x}</option>`).join('')}</select><button onclick="act('${id}','/status',{status:$('#ns').value})">Set status</button>
+ <button class=s onclick="act('${id}','/escalate')">Escalate</button>${mg?`<select id=as>${staff.map(s=>`<option>${s.username}</option>`).join('')}</select><button class=s onclick="act('${id}','/assign',{staff_id:$('#as').value})">Assign</button>`:''}</div>`:''}
+ <div class="card"><h3>Conversation & timeline</h3>${t.timeline.map(e=>`<p class="${e.internal?'note':''}"><small>${e.ts} · ${esc(e.actor)}</small><br><b>${esc(e.action)}</b> ${esc(e.detail)} ${e.internal?'<i>(internal)</i>':''}</p>`).join('')}
+ ${t.status!='Closed'?`<textarea id=rt rows=3 placeholder="Write a reply"></textarea><button onclick="act('${id}','/reply',{text:$('#rt').value})">Reply</button>${st?`<button class=s onclick="act('${id}','/reply',{text:$('#rt').value,internal:true})">Add internal note</button>`:''}`:''}
+ ${!st&&(t.status=='Resolved'||t.status=='Closed')&&!t.satisfaction_score?`<p>Rate: ${[1,2,3,4,5].map(n=>`<button class=s onclick="act('${id}','/feedback',{score:${n}})">${n}</button>`).join('')}</p>`:''}</div>`}catch(e){m.innerHTML=`<p class=err>${esc(e.message)}</p>`}}
+async function autoEsc(){try{const r=await api('/admin/auto-escalate',{body:{}});alert(r.escalated+' ticket(s) escalated');dash()}catch(e){alert(e.message)}}
+tok?shell().catch(logout):landing();
+</script></body></html>
