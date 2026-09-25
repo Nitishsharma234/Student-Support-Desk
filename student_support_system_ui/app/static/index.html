@@ -12,15 +12,32 @@ button{padding:8px 14px;border:0;border-radius:8px;background:var(--p);color:#ff
 button:hover{background:var(--pd)}button.s{background:#fff;color:var(--t);border:1px solid #cfd6e2}button.s:hover{background:#f2f4f8}
 button:disabled{opacity:.55;cursor:not-allowed}
 /* landing/login */
-.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 16px;background:linear-gradient(#fff,#eef2f9)}
-.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px}.logo{width:34px;height:34px;border-radius:8px;background:var(--p);color:#fff;display:grid;place-items:center;font-size:17px}
-.hero h1{font-size:30px;margin:22px 0 6px;text-align:center}.hero p.sub{color:var(--m);margin:0 0 30px;text-align:center}
-.roles{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;width:100%;max-width:720px}
-.role{background:var(--c);border:1px solid var(--b);border-radius:12px;padding:24px;cursor:pointer;box-shadow:var(--sh);transition:.15s}
-.role:hover,.role:focus{border-color:var(--p);box-shadow:0 4px 14px rgba(36,85,214,.12)}.role .ic{width:40px;height:40px;border-radius:10px;background:var(--pl);display:grid;place-items:center;font-size:20px;margin-bottom:14px}
-.role h3{margin-bottom:4px}.role span{color:var(--m);font-size:13px}
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#f8fafc}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px;letter-spacing:-.01em}
+.logo{width:34px;height:34px;border-radius:8px;background:#0f2a5f;color:#fff;display:grid;place-items:center;font-size:15px;font-weight:700}
+.hero h1{font-size:34px;margin:26px 0 10px;text-align:center;letter-spacing:-.02em;font-weight:700;color:#0f2a5f}
+.hero p.sub{color:var(--m);margin:0;text-align:center;font-size:16px;max-width:480px;line-height:1.55}
+.hero p.tag{color:#0f2a5f;margin:14px 0 0;text-align:center;font-size:13px;font-weight:600;letter-spacing:.02em}
+.hero-band{width:100%;background:#0f2a5f;padding:48px 20px 56px;display:flex;flex-direction:column;align-items:center}
+.hero-band .brand{color:#fff}
+.hero-band .logo{background:#fff;color:#0f2a5f}
+.hero-band h1{color:#fff}
+.hero-band p.sub{color:#c9d4e8}
+.hero-band p.tag{color:#8fa3c9}
+.role-section{flex:1;width:100%;background:#f8fafc;display:flex;flex-direction:column;align-items:center;padding:48px 20px 40px}
+.section-label{width:100%;max-width:820px;text-align:center;font-size:20px;font-weight:700;color:#0f2a5f;margin:0 0 32px}
+.roles{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;width:100%;max-width:820px}
+.role{background:#fff;border:1px solid var(--b);border-radius:10px;padding:28px 24px;cursor:pointer;box-shadow:0 1px 3px rgba(16,24,40,.06);transition:border-color .15s,box-shadow .15s;text-align:left;display:flex;flex-direction:column}
+.role:hover,.role:focus-visible{border-color:#0f2a5f;box-shadow:0 4px 14px rgba(15,42,95,.1)}
+.role .ic{width:44px;height:44px;border-radius:8px;background:#eef2f8;color:#0f2a5f;display:grid;place-items:center;font-size:20px;margin-bottom:18px}
+.role h3{margin-bottom:8px;font-size:16px;color:#0f2a5f;font-weight:700}
+.role span{color:#667085;font-size:13.5px;line-height:1.55;display:block;flex:1}
+.role .go{margin-top:18px;font-size:13px;font-weight:600;color:#0f2a5f;display:flex;align-items:center;gap:5px}
+.foot-note{margin-top:40px;color:#98a2b3;font-size:12.5px;text-align:center}
 .login{width:100%;max-width:400px;background:#fff;border:1px solid var(--b);border-radius:12px;padding:28px;box-shadow:0 4px 20px rgba(16,24,40,.07)}
 .login input{width:100%;margin-bottom:14px}.login .row{display:flex;gap:8px}.login .row button:first-child{flex:1}
+.login input:focus{border-color:#0f2a5f;outline-color:#0f2a5f}
+.login button:not(.s){background:#0f2a5f}.login button:not(.s):hover{background:#0a1f47}
 .err{color:#b42318;font-size:13px;min-height:18px}
 /* shell */
 .app{display:flex;min-height:100vh}.side{width:232px;background:var(--side);color:#fff;padding:18px 14px;flex-shrink:0;display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
@@ -59,6 +76,8 @@ td,th{text-align:left;padding:11px 14px;border-bottom:1px solid var(--b)}tr.r{cu
 @media(max-width:900px){.dl{grid-template-columns:1fr}}
 @media(max-width:760px){.app{flex-direction:column}.side{width:100%;height:auto;position:static;padding:10px 12px;flex-direction:row;flex-wrap:wrap;align-items:center;gap:6px}.side .brand{padding:0;flex:1}.user{display:none}
 .nav{display:flex;flex-wrap:wrap;gap:4px;width:100%}.nav a{padding:6px 10px;margin:0}.nav .sp{display:none}.main{padding:16px}}
+@media(max-width:700px){.roles{grid-template-columns:1fr}}
+@media(max-width:480px){.hero-band{padding:36px 16px 44px}.hero h1{font-size:26px}.hero p.sub{font-size:14.5px}.role{padding:22px 20px}.role-section{padding:36px 16px 32px}}
 </style></head><body><div id="root"></div><script>
 let tok=sessionStorage.tok,me=null,ROLE=null,filt={},charts=[];
 const $=s=>document.querySelector(s),R=$('#root');
@@ -69,9 +88,16 @@ function toast(m){const d=document.createElement('div');d.className='toast';d.te
 async function api(p,o={}){const r=await fetch('/api'+p,{method:o.body?'POST':'GET',headers:{'Content-Type':'application/json',Authorization:'Bearer '+tok},body:o.body&&JSON.stringify(o.body)});
  const d=await r.json().catch(()=>({}));if(!r.ok){if(r.status==401&&tok){logout();}throw new Error(typeof d.detail=='string'?d.detail:JSON.stringify(d.detail||'Error'))}return d}
 function logout(){sessionStorage.clear();tok=null;me=null;landing()}
-function landing(){R.innerHTML=`<div class="hero"><div class="brand"><div class="logo">S</div>Student Support Desk</div><h1>Welcome to the Support Portal</h1><p class="sub">Raise, track and resolve college support requests in one place.</p><div class="roles">
- ${[['student','🎓','Student','Raise and track your tickets','Roll number'],['staff','🛠️','Staff','Handle assigned support tickets','Employee ID'],['manager','📊','Manager / Admin','Monitor SLA, workload and escalations','Username']].map(r=>`<div class="role" tabindex="0" onkeydown="if(event.key=='Enter')this.click()" onclick="loginForm('${r[0]}','${r[4]}')"><div class="ic">${r[1]}</div><h3>${r[2]}</h3><span>${r[3]}</span></div>`).join('')}</div></div>`}
-function loginForm(role,lbl){const nm={student:'Student',staff:'Staff',manager:'Manager / Admin'}[role];R.innerHTML=`<div class="hero"><div class="brand"><div class="logo">S</div>Student Support Desk</div><h1 style="font-size:22px">${nm} sign in</h1><p class="sub">Enter your credentials to continue</p><div class="login">
+function landing(){R.innerHTML=`<div class="hero"><div class="hero-band"><div class="brand"><div class="logo">S</div>Student Support Desk</div>
+ <h1>Student Support, Simplified.</h1>
+ <p class="sub">Raise requests, track progress, and connect with the right support team — all in one place.</p>
+ <p class="tag">Fast. Transparent. Student-focused.</p></div>
+ <div class="role-section">
+ <div class="section-label">How would you like to continue?</div>
+ <div class="roles">
+ ${[['student','🎓','Student','Raise support requests, track ticket status, and stay updated on resolutions.','Roll number'],['staff','🛠️','Staff','Manage assigned tickets, respond to students, and keep requests moving.','Employee ID'],['manager','📊','Manager / Admin','Monitor operations, SLA performance, workload, escalations, and support activity.','Username']].map(r=>`<div class="role" tabindex="0" onkeydown="if(event.key=='Enter')this.click()" onclick="loginForm('${r[0]}','${r[4]}')"><div class="ic">${r[1]}</div><h3>${r[2]}</h3><span>${r[3]}</span><div class="go">Continue →</div></div>`).join('')}</div>
+ <p class="foot-note">Student Support Desk • College Support Management Portal</p></div></div>`}
+function loginForm(role,lbl){const nm={student:'Student',staff:'Staff',manager:'Manager / Admin'}[role];R.innerHTML=`<div class="hero"><div class="brand"><div class="logo">S</div>Student Support Desk</div><h1 style="font-size:22px">${nm} sign in</h1><p class="sub">Enter your credentials to continue</p><div class="login" style="margin-top:28px">
  <label for="u">${lbl}</label><input id="u" autocomplete="username" onkeydown="if(event.key=='Enter')$('#p').focus()"><label for="p">Password</label><input id="p" type="password" autocomplete="current-password" onkeydown="if(event.key=='Enter')doLogin('${role}')">
  <p id="e" class="err"></p><div class="row"><button id="lb" onclick="doLogin('${role}')">Sign in</button><button class="s" onclick="landing()">Back</button></div></div></div>`;$('#u').focus()}
 async function doLogin(role){const b=$('#lb');b.disabled=true;b.textContent='Signing in…';try{const d=await api('/login',{body:{role,username:$('#u').value.trim(),password:$('#p').value}});tok=sessionStorage.tok=d.token;me=d.user;shell()}catch(e){$('#e').textContent=e.message;b.disabled=false;b.textContent='Sign in'}}
