@@ -1,30 +1,115 @@
-# Student Support & Ticket Management System
-FastAPI + MongoDB + vanilla JS + scikit-learn. One landing page (Student / Staff / Manager-Admin); team & permissions come from the account.
+# Student Support Desk
 
-## Run
-```
-pip install -r requirements.txt
-cp .env.example .env            # set MONGO_URI (mongodb://localhost:27017) and SECRET_KEY
-export $(grep -v '^#' .env | xargs)
-python -m scripts.seed_database                       # demo users
-cp <your csv> data/student_support_tickets_50000.csv
-python -m scripts.train_models                        # trains + saves ml/models/*.joblib, writes ML_REPORT_generated.md
-uvicorn app.main:app --reload                         # http://localhost:8000
-pytest -q                                             # uses in-memory mongomock (MONGO_URI=mock)
-```
-Without trained models the app still works: every ticket goes to **General Support / Medium** flagged "manual verification required" (discipline keyword rule still applies).
+A role-based Student Support & Ticket Management System designed for colleges to manage student requests, staff ownership, SLAs, escalations, and ticket resolution.
 
-## Demo accounts (password `Demo@123`)
-Student `STU23BCSE0001` (also `STU23BCSE0002`) · Staff `acc_staff1|2`, `acad_staff1|2`, `adm_staff1|2`, `disc_staff1|2`, `gen_staff1|2` · Managers `acc_mgr`, `acad_mgr`, `adm_mgr`, `disc_mgr`, `gen_mgr` · Admin `admin`
+The system also includes an ML-assisted layer for ticket category and priority prediction, with manual verification for uncertain predictions.
 
-## Design decisions
-- ML = recommendation only (TF-IDF + metadata → Logistic Regression, class-balanced). Below 60% confidence the app does not apply it and flags the ticket. Discipline/ragging keywords override ML → Discipline team, Urgent, 4h SLA. Staff can Accept/Change; changes are audited and re-route the ticket.
-- **Excluded from ML (leakage):** assigned_team, assigned_staff_id, status, first_response_at, resolved_at, sla_hours (a function of category), resolution_time_hours, sla_breached, escalation_count, number_of_replies, student_response_time_hours, satisfaction_score, first_response_time_hours, reassignment_count. Inputs: title+description, department, channel, year, semester, attachment_present, previous_tickets_count.
-- **SLA risk is rule-based** (deadline = created + category SLA; At Risk = <25% time left). No ML SLA model: the dataset's only SLA signals are post-hoc outcomes, so a model would leak.
-- Teams: Accounts, Academic Office, Administration (ID Card/Documents/Certificate), Discipline, General Support (Other). The CSV's separate "Student Services" team is merged into Administration.
-- Tickets embed their timeline/messages (internal notes flagged and stripped for students). Students get 404 for others' tickets.
+---
 
-## Not done / limitations (honest status)
-- Model metrics are not reported yet: the full CSV was not available to me; run `train_models` and use its report. No accuracy is claimed.
-- Attachments, `import_csv.py`, ARCHITECTURE/ML_REPORT/ASSUMPTIONS/AI_USAGE docs are not written. Frontend is functional but minimal and was not browser-tested. Auto-escalation runs on manager click, not a scheduler.
-- Dataset notes from the visible rows: priority looks weakly tied to text (e.g. a double-payment Fee ticket is "Low"), so expect modest priority accuracy; blank satisfaction/response fields are ignored (post-creation anyway); typos in text are common (TF-IDF bigrams help).
+## 🚀 Features
+
+### Student
+- Create support tickets
+- View personal tickets
+- Track ticket status
+- Reply to tickets
+- View ticket history
+- Submit feedback after resolution
+
+### Staff
+- View assigned tickets
+- Process support requests
+- Update ticket status
+- Reply to students
+- Add internal notes
+- Resolve or escalate tickets
+- Monitor SLA status
+
+### Manager / Admin
+- View organization-level ticket information
+- Monitor SLA and escalations
+- View staff workload
+- Track ticket ageing
+- Monitor categories and priorities
+- Review operational activity
+
+---
+
+## 🤖 ML-Assisted Ticket Classification
+
+The system is designed to predict:
+
+1. **Ticket Category**
+   - Fee
+   - Attendance
+   - ID Card
+   - Documents
+   - Certificate
+   - Other
+   - etc.
+
+2. **Ticket Priority**
+   - Low
+   - Medium
+   - High
+   - Urgent
+
+### Model
+
+The planned ML pipeline uses:
+
+- TF-IDF text features
+- Unigrams + bigrams
+- One-hot encoded categorical features
+- Logistic Regression
+- Class weighting for imbalanced classes
+- 80/20 stratified holdout split
+
+The text input consists primarily of the ticket title and description, along with creation-time metadata.
+
+### Important: No Fabricated Metrics
+
+The training dataset is not included in this repository and models are not shipped with the submission.
+
+Therefore, **no accuracy, precision, recall, F1-score, or confusion-matrix values are claimed**.
+
+This is intentional. Reporting metrics without actually training and evaluating the model would be misleading.
+
+When the dataset is available, the training pipeline can generate a real evaluation report.
+
+---
+
+## 🔐 ML Safety & Leakage Prevention
+
+The model only uses information available when a ticket is created.
+
+Post-processing information such as:
+
+- assigned staff
+- assigned team
+- ticket status
+- resolution time
+- SLA breach
+- escalation count
+- number of replies
+- satisfaction score
+- response times
+
+is excluded from the ML feature set.
+
+This prevents target leakage and avoids artificially inflated evaluation results.
+
+### Low-Confidence Predictions
+
+If model confidence is below `0.60`, the prediction is not blindly applied.
+
+Instead:
+
+```text
+Low confidence
+      ↓
+Safe default
+      ↓
+needs_review = True
+      ↓
+Staff manually verifies
